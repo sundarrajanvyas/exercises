@@ -25,7 +25,8 @@ def cleanDoc(doc):
     ##End adding custon Stop words
     stemmer = nltk.PorterStemmer()
     tokens = nltk.WordPunctTokenizer().tokenize(doc)
-    clean = [token.lower() for token in tokens if token.lower() not in stopset and len(token) > 2]
+    clean = [token.lower() for token in tokens if token.lower()
+             not in stopset and len(token) > 2]
     final = [stemmer.stem(word) for word in clean]
     return final
 
@@ -49,18 +50,17 @@ def leastPopular(fileName,count):
     for elements in dispVal:
         print dictionary[elements[0]] + ":" + str(elements[1])
 
-def no_of_types(fileName,searchWord):
-    dataele =[]
-    newdata =[]
+def noOfTypes(fileName,searchWord):
+    dataElement =[]
     dataPosDict = {}
-    a = open(fileName,'r')
-    for lines in a.readlines():
+    fOpen = open(fileName,'r')
+    for lines in fOpen.readlines():
         y=lines.split()
-        dataele.append(y)
-    a.close()
+        dataElement.append(y)
+    fOpen.close()
     ##Create word position dictionary
-    for i in range(len(dataele)):
-        for word in dataele[i]:
+    for i in range(len(dataElement)):
+        for word in dataElement[i]:
             if word in dataPosDict:
                 dataPosDict[word].append(int(i) + 1)
             else:
@@ -68,16 +68,19 @@ def no_of_types(fileName,searchWord):
 
     retVal = 0
     outputSet = set()
-    ##wordWindowSize = 2      ##Delete when Api is updated to handle multiple leading words as descriptors. eg "Super Awesome Guitar" is a type of gutar  
+    ##wordWindowSize = 2      ##Delete when Api is updated to handle multiple
+    ##leading words as descriptors. eg "Super Awesome Guitar" is a type of gutar  
     if searchWord in dataPosDict:
         for lineNo in dataPosDict[searchWord]:
             semLine = linecache.getline(fileName, lineNo)
             semLine = semLine.split()
             for wordLoc in range(len(semLine)):
                 if (semLine[wordLoc] == searchWord):
-                    ##If the line starts with a guitar, then it is assumed the type is not specified.
+                    ##If the line starts with a guitar, then it is assumed the
+                    ##type is not specified.
                     if (wordLoc != 0):
-                        ##Assuming only the word before the searchWord is usually the descriptor
+                        ##Assuming only the word before the searchWord is
+                        ##usually the descriptor
                         outputSet.add(semLine[wordLoc - 1]) 
                     
         retVal = len(outputSet)
@@ -90,18 +93,24 @@ class MyCorpus(object):
         for line in open('deals.txt'):
             yield id2word.doc2bow(line.lower().split())
 
-id2word = corpora.Dictionary(line.lower().split() for line in cleanDoc(open('deals.txt').read()))
+id2word = corpora.Dictionary(line.lower().split() for line
+                             in cleanDoc(open('deals.txt').read()))
 
 def perfTopic(no_of_topics):
     corpus = MyCorpus()
     corpora.MmCorpus.serialize('dealsCorpus.mm', corpus)
     corpus = corpora.MmCorpus('dealsCorpus.mm')
     print corpus
-##  Following line should be commented for not displaying the online LDA convergence Logs.
-    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s', level=logging.INFO)
+    ##  Following line should be commented for not displaying the online LDA
+    ##  convergence Logs.
+    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s',
+                        level=logging.INFO)
     tfidf = models.TfidfModel(corpus)
     print tfidf
-    lda = gensim.models.ldamodel.LdaModel(corpus=corpus, id2word=id2word, num_topics=no_of_topics, update_every=1, chunksize=5, passes=1)
+    lda = gensim.models.ldamodel.LdaModel(corpus=corpus, id2word=id2word,
+                                          num_topics=no_of_topics,
+                                          update_every=1, chunksize=5,
+                                          passes=1)
     return lda
 
 
