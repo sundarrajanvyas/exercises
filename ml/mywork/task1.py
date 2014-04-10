@@ -96,7 +96,7 @@ class MyCorpus(object):
 id2word = corpora.Dictionary(line.lower().split() for line
                              in cleanDoc(open('deals.txt').read()))
 
-def perfTopic(no_of_topics):
+def perfTopic(noOfTopics):
     corpus = MyCorpus()
     corpora.MmCorpus.serialize('dealsCorpus.mm', corpus)
     corpus = corpora.MmCorpus('dealsCorpus.mm')
@@ -108,7 +108,7 @@ def perfTopic(no_of_topics):
     tfidf = models.TfidfModel(corpus)
     print tfidf
     lda = gensim.models.ldamodel.LdaModel(corpus=corpus, id2word=id2word,
-                                          num_topics=no_of_topics,
+                                          num_topics=noOfTopics,
                                           update_every=1, chunksize=5,
                                           passes=1)
     return lda
