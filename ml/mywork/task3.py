@@ -14,3 +14,34 @@ Also, provide comments on:
     - How did you test your classifier?
 
 """
+## Reference
+## http://www.slideshare.net/jpatanooga/sea-hug-navebayes24042011v5
+from text.classifiers import NaiveBayesClassifier
+
+def formTrainSet(fileName,classification):
+    trainSet = []
+    fOpen = open(fileName,'r')
+    for lines in fOpen.readlines():
+        temp = []
+        temp.append(lines)
+        temp.append(classification)
+        trainSet.append(temp)
+    fOpen.close()
+    return trainSet
+
+## Instance specific implementation
+def getTrainSet():
+    trainingSet = []
+    goodSet = formTrainSet('good_deals.txt','good_deals')
+    badSet = formTrainSet('bad_deals.txt','bad_deals')
+    trainingSet = goodSet+badSet
+    return trainingSet
+
+def testSet(testSetFileName):
+    trainSet = getTrainSet()
+    classifierNB = NaiveBayesClassifier(trainSet)
+    fOpen=open(testSetFileName,'r')
+    for lines in fOpen.readlines():
+        classification = ''
+        classification = classifierNB.classify(lines)
+        print lines + " :: " + classification
