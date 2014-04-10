@@ -15,8 +15,11 @@ from collections import Counter
 import operator
 import linecache
 import nltk
-import logging, gensim, bz2
-
+import sys
+import numpy
+import logging
+import gensim
+import bz2
 
 def cleanDoc(doc):
     stopset = nltk.corpus.stopwords.words('english')
@@ -68,6 +71,7 @@ def noOfTypes(fileName,searchWord):
 
     retVal = 0
     outputSet = set()
+    cleanedSet = set()
     ##wordWindowSize = 2      ##Delete when Api is updated to handle multiple
     ##leading words as descriptors. eg "Super Awesome Guitar" is a type of gutar  
     if searchWord in dataPosDict:
@@ -81,50 +85,15 @@ def noOfTypes(fileName,searchWord):
                     if (wordLoc != 0):
                         ##Assuming only the word before the searchWord is
                         ##usually the descriptor
-                        outputSet.add(semLine[wordLoc - 1]) 
-                    
-        retVal = len(outputSet)
+                        outputSet.add(semLine[wordLoc - 1])
+        ## Removing precursors that seems as stopwords.
+        stopset = nltk.corpus.stopwords.words('english')
+        for elements in outputSet:
+            if elements.lower() not in stopset:
+                cleanedSet.add(elements)
+        ## The + 1 is a placeholder for a guitar with no specific attributes.
+        ## A non-unique plain guitar is a guitar type nevertheless.
+        retVal = len(cleanedSet) + 1
         return retVal
     else:
         return retVal
-
-class MyCorpus(object):
-    def __iter__(self):
-        for line in open('deals.txt'):
-            yield id2word.doc2bow(line.lower().split())
-
-id2word = corpora.Dictionary(line.lower().split() for line
-                             in cleanDoc(open('deals.txt').read()))
-
-def perfTopic(noOfTopics):
-    corpus = MyCorpus()
-    corpora.MmCorpus.serialize('dealsCorpus.mm', corpus)
-    corpus = corpora.MmCorpus('dealsCorpus.mm')
-    print corpus
-    ##  Following line should be commented for not displaying the online LDA
-    ##  convergence Logs.
-    logging.basicConfig(format='%(asctime)s : %(levelname)s : %(message)s',
-                        level=logging.INFO)
-    tfidf = models.TfidfModel(corpus)
-    print tfidf
-    lda = gensim.models.ldamodel.LdaModel(corpus=corpus, id2word=id2word,
-                                          num_topics=noOfTopics,
-                                          update_every=1, chunksize=5,
-                                          passes=1)
-    return lda
-
-
-
-
-
-
-    
-
-        
-        
-
-
-
-
-
-    

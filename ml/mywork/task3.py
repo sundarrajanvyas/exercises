@@ -11,7 +11,14 @@ We would like to see a couple of steps:
 
 Also, provide comments on:
     - How general is your classifier?
-        Data trainingSet() has trainfile names and it's classification hardcoded.
+        Classifier is as general as it can be.It will work on just about any set
+        data pertaining to any set of topics. 
+        UpWeighing - An addon that works on the data that is fed into the 
+                     classifier.eg Terms such as 'code' are treated as if they
+                     have occured multiple times.Increasing their weight.
+        Morphological stemming - Considering morphological stemming that reduces
+                                 synonyms to root words. [Not included]
+                                 [TBD] 
     - How did you test your classifier?
         Test it with the existing training set.Both good deals and bad deals.
         Usually industry practice is to train the classifier on 70 % of labeled
@@ -21,7 +28,8 @@ Also, provide comments on:
         Depending on the initial train data set size(sparse) choosing 70-30 and
         testing will yield a broader range of accuracies.Hence the approach to
         use the same 100 % data set for trainging and testing purposes.
-        There is a risk of overfitting the data that is also to be noted. 
+        There is a risk of overfitting the data that is also to be noted.
+        Precision/recall and F1 scores is the standard for evaluation.
 """
 
 ## Reference
@@ -41,6 +49,13 @@ def cleanDoc(doc):
     final = [stemmer.stem(word) for word in clean]
     return final
 
+##Tuning by up weighing .
+## Add important words to upWeigher
+upWeighter = ['code','coupon','coupons','promo']
+## No of times upWeigher terms are repeated
+weight = 20
+##End tuning by upweighing
+
 def formTrainSet(fileName,classification):
     trainSet = []
     fOpen = open(fileName,'r')
@@ -48,8 +63,15 @@ def formTrainSet(fileName,classification):
         ##Tune by eliminating generic stop words.
         stemmedLines = ''
         tempArray = []
+        iterArray = []
         tempArray.append(lines.split())
         for word in tempArray[0]:
+            if (word.lower() in upWeighter):
+                for x in range(0,weight):
+                    iterArray.append(word)
+            else:
+                iterArray.append(word)
+        for word in iterArray:
             if (cleanDoc(word) != ' '):
                 stemmedLines = stemmedLines+ ''.join(cleanDoc(word)) + ' '
         ##End stemming.
@@ -63,8 +85,8 @@ def formTrainSet(fileName,classification):
 ## Instance specific implementation
 def getTrainSet():
     trainingSet = []
-    goodSet = formTrainSet('good_deals.txt','good_deals')
-    badSet = formTrainSet('bad_deals.txt','bad_deals')
+    goodSet = formTrainSet('../data/good_deals.txt','good_deals')
+    badSet = formTrainSet('../data/bad_deals.txt','bad_deals')
     trainingSet = goodSet+badSet
     return trainingSet
 
@@ -134,8 +156,9 @@ def accuracyTester(fileName,label):
     return total,correct
 
 def netAccuracyTester():
-    goodSet = accuracyTester('good_deals.txt','good_deals')
-    badSet = accuracyTester('bad_deals.txt','bad_deals')
+    goodSet = accuracyTester('../data/good_deals.txt','good_deals')
+    badSet = accuracyTester('../data/bad_deals.txt','bad_deals')
     netAccuracy = 0.00
     netAccuracy = (((goodSet[1]+badSet[1]) * 100 )/ (goodSet[0]+badSet[0]))
     print "Theoretical best accuracy "+ str(netAccuracy) + "%"
+

@@ -42,3 +42,4 @@ if __name__ == '__main__':
     classified = [cluster.classify(vectorSpaced(title)) for title in jobTitles]
     for cluster_id, title in sorted(zip(classified, jobTitles)):
         print cluster_id, title
+
