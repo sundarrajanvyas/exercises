@@ -35,6 +35,7 @@ Also, provide comments on:
 ## Reference
 ## http://www.slideshare.net/jpatanooga/sea-hug-navebayes24042011v5
 import nltk
+import sys
 from text.classifiers import NaiveBayesClassifier
 
 def cleanDoc(doc):
@@ -83,16 +84,15 @@ def formTrainSet(fileName,classification):
     return trainSet
 
 ## Instance specific implementation
-def getTrainSet(goodDataLoc,badDataLoc):
+def getTrainSet():
     trainingSet = []
-    goodSet = formTrainSet(goodDataLoc,'good_deals')
-    badSet = formTrainSet(badDataLoc,'bad_deals')
+    goodSet = formTrainSet('../data/good_deals.txt','good_deals')
+    badSet = formTrainSet('../data/bad_deals.txt','bad_deals')
     trainingSet = goodSet+badSet
     return trainingSet
 
-def testSet(testSetFileName,goodDataLoc,badDataLoc):
-    retStatus = 0
-    trainSet = getTrainSet(goodDataLoc,badDataLoc)
+def testSet(testSetFileName):
+    trainSet = getTrainSet()
     classifierNB = NaiveBayesClassifier(trainSet)
     fOpen=open(testSetFileName,'r')
     for lines in fOpen.readlines():
@@ -106,11 +106,15 @@ def testSet(testSetFileName,goodDataLoc,badDataLoc):
                 stemmedLines = stemmedLines+ ''.join(cleanDoc(word)) + ' '
         ##End stemming.
         classification = classifierNB.classify(stemmedLines)
-        retStatus += 1
         print lines + " :: " + classification
     fOpen.close()
-    return retStatus
 
+if __name__ == '__main__':
+    if len(sys.argv) == 2:
+        fileName = sys.argv[1]
+        testSet(fileName)
+
+        
 ## Compares difference in results based on the tuning.
 ## Returns instances of classifications that differed.
 def compareStemmerEffects(testSetFileName):

@@ -79,7 +79,7 @@ def noOfTypes(fileName,searchWord):
     outputSet = set()
     cleanedSet = set()
     ##wordWindowSize = 2      ##Delete when Api is updated to handle multiple
-    ##leading words as descriptors. eg "Super Awesome Guitar" is a type of gutar  
+    ##leading words as descriptors.eg"Super Awesome Guitar" is a type of gutar  
     if searchWord in dataPosDict:
         for lineNo in dataPosDict[searchWord]:
             semLine = linecache.getline(fileName, lineNo)
@@ -94,12 +94,72 @@ def noOfTypes(fileName,searchWord):
                         outputSet.add(semLine[wordLoc - 1])
         ## Removing precursors that seems as stopwords.
         stopset = nltk.corpus.stopwords.words('english')
+        stopset.append('-')
         for elements in outputSet:
             if elements.lower() not in stopset:
                 cleanedSet.add(elements)
+        ## Here we intentionally skip POS tagging.
+        
         ## The + 1 is a placeholder for a guitar with no specific attributes.
         ## A non-unique plain guitar is a guitar type nevertheless.
         retVal = len(cleanedSet) + 1
+        print cleanedSet
         return retVal
     else:
         return retVal
+
+def noOfTypesApproach2(fileName,searchWord):
+    dataElement =[]
+    dataPosDict = {}
+    fOpen = open(fileName,'r')
+    for lines in fOpen.readlines():
+        ##lines = lines.lower()
+        y=lines.split()
+        dataElement.append(y)
+    fOpen.close()
+    ##Create word position dictionary
+    for i in range(len(dataElement)):
+        for word in dataElement[i]:
+            if word in dataPosDict:
+                dataPosDict[word].append(int(i) + 1)
+            else:
+                dataPosDict[word] = [int(i) + 1]
+    retVal = 0
+    wordLoc = 0
+    outputSet = set()
+    ##wordWindowSize = 2      ##Delete when Api is updated to handle multiple
+    ##leading words as descriptors.eg"Super Awesome Guitar" is a type of gutar  
+    if searchWord in dataPosDict:
+        for lineNo in dataPosDict[searchWord]:
+            semLine = linecache.getline(fileName, lineNo)
+            ##semLine= semLine.lower()
+            tok = nltk.word_tokenize(semLine)
+            posTagged = nltk.pos_tag(tok)
+            for wordLoc in range(len(posTagged)):
+                if (posTagged[wordLoc][0] == searchWord):
+                    if (wordLoc != 0):
+                        if (posTagged[int(wordLoc)-1][1] == 'NNP'):
+                            outputSet.add(posTagged[wordLoc - 1][0])
+        ## +1 denotes the normal guitar without any specialization.
+        retVal = len(outputSet) + 1
+        print outputSet
+        return retVal
+    else:
+        return retVal                            
+                        
+
+if __name__ == '__main__':
+    if len(sys.argv) == 2:
+        fileName = sys.argv[1]
+        mostOut = []
+        mostOut = mostPopular(fileName,1)
+        print 'Most popular :: ' + mostOut[0]
+        leastOut= []
+        leastOut = leastPopular(fileName,1)
+        print 'Most popular :: ' + leastOut[0]
+        print '\n Without POS taggin no of guitars is :'
+        outNo = noOfTypes(fileName,'guitar') + noOfTypes(fileName,'Guitar') + noOfTypes(fileName,'Guitars') - 2
+        print 'No of guitars is ' + str(outNo)
+        print '\n Using POS tagging . No of Guitars .'
+        outNo = noOfTypesApproach2(fileName,'Guitar') + noOfTypesApproach2(fileName,'Guitars') - 1
+        print 'No of guitars is ' + str(outNo) 
