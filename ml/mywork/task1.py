@@ -34,6 +34,7 @@ def cleanDoc(doc):
     return final
 
 def mostPopular(fileName,count):
+    retVal = []
     doc = cleanDoc(open(fileName).read())
     dictionary = corpora.Dictionary(line.lower().split() for line in doc)
     list1 = dictionary.doc2bow(doc,1)
@@ -42,8 +43,11 @@ def mostPopular(fileName,count):
     dispVal = sorted(dict1.iteritems(), key=lambda x:-x[1])[:count]
     for elements in dispVal:
         print dictionary[elements[0]] + ":" + str(elements[1])
+        retVal.append(dictionary[elements[0]])
+    return retVal
 
 def leastPopular(fileName,count):
+    retVal = []
     doc = cleanDoc(open(fileName).read())
     dictionary = corpora.Dictionary(line.lower().split() for line in doc)
     list1 = dictionary.doc2bow(doc,1)
@@ -52,6 +56,8 @@ def leastPopular(fileName,count):
     dispVal = sorted(dict1.iteritems(), key=lambda x:x[1])[:count]
     for elements in dispVal:
         print dictionary[elements[0]] + ":" + str(elements[1])
+        retVal.append(dictionary[elements[0]])
+    return retVal    
 
 def noOfTypes(fileName,searchWord):
     dataElement =[]

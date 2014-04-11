@@ -27,8 +27,8 @@ id2word = corpora.Dictionary(line.lower().split() for line
 
 def perfTopic(noOfTopics):
     corpus = MyCorpus()
-    corpora.MmCorpus.serialize('dealsCorpus.mm', corpus)
-    corpus = corpora.MmCorpus('dealsCorpus.mm')
+    ##corpora.MmCorpus.serialize('dealsCorpus.mm', corpus)
+    ##corpus = corpora.MmCorpus('dealsCorpus.mm')
     print corpus
     ##  Following line should be commented for not displaying the online LDA
     ##  convergence Logs.

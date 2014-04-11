@@ -37,7 +37,7 @@ if __name__ == '__main__':
     fOpen = open(fileName,'r')
     jobTitles = [line.strip() for line in fOpen.readlines()]
     words = getWords(jobTitles)
-    cluster = GAAClusterer(5)
+    cluster = GAAClusterer(int(noOfClusters))
     cluster.cluster([vectorSpaced(title) for title in jobTitles if title])
     classified = [cluster.classify(vectorSpaced(title)) for title in jobTitles]
     for cluster_id, title in sorted(zip(classified, jobTitles)):

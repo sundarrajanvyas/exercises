@@ -83,15 +83,16 @@ def formTrainSet(fileName,classification):
     return trainSet
 
 ## Instance specific implementation
-def getTrainSet():
+def getTrainSet(goodDataLoc,badDataLoc):
     trainingSet = []
-    goodSet = formTrainSet('../data/good_deals.txt','good_deals')
-    badSet = formTrainSet('../data/bad_deals.txt','bad_deals')
+    goodSet = formTrainSet(goodDataLoc,'good_deals')
+    badSet = formTrainSet(badDataLoc,'bad_deals')
     trainingSet = goodSet+badSet
     return trainingSet
 
-def testSet(testSetFileName):
-    trainSet = getTrainSet()
+def testSet(testSetFileName,goodDataLoc,badDataLoc):
+    retStatus = 0
+    trainSet = getTrainSet(goodDataLoc,badDataLoc)
     classifierNB = NaiveBayesClassifier(trainSet)
     fOpen=open(testSetFileName,'r')
     for lines in fOpen.readlines():
@@ -105,8 +106,10 @@ def testSet(testSetFileName):
                 stemmedLines = stemmedLines+ ''.join(cleanDoc(word)) + ' '
         ##End stemming.
         classification = classifierNB.classify(stemmedLines)
+        retStatus += 1
         print lines + " :: " + classification
     fOpen.close()
+    return retStatus
 
 ## Compares difference in results based on the tuning.
 ## Returns instances of classifications that differed.
